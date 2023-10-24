@@ -311,6 +311,10 @@ class Gravity(pg.sprite.Sprite):
         self.life = life        
 
     def update(self):
+        self.life -= 1
+        if self.life < 0:
+            self.kill()
+    
 
 
 
@@ -336,10 +340,6 @@ class NeoGravity(pg.sprite.Sprite):
         self.life -= 1
         if self.life < 0:
             self.kill()
-
-
-
-
 
 
 def main():
@@ -386,7 +386,7 @@ def main():
 
 
             if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
-                if score.score > -100: #TODO :スコアを200に変更
+                if score.score > -100: # :スコアを200に変更
                     neos.add(NeoGravity(400))
                     score.score -= 200
 
@@ -438,8 +438,7 @@ def main():
             exps.add(Explosion(gra, 50))  # 爆発エフェクト
 
 
-            score.score_up(100)  # 1点アップ                                                         TODO
-
+            score.score_up(100)  # 1点アップ                                                        
         for bomb in pg.sprite.groupcollide(emys, neos, True, False).keys():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.score_up(1)  # 1点アップ      
