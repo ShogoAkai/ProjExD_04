@@ -248,6 +248,21 @@ class Score:
         self.image = self.font.render(f"Score: {self.score}", 0, self.color)
         screen.blit(self.image, self.rect)
 
+class Gravity(pg.sprite.Sprite):
+    def __init__(self, bird, size, life):
+        super().__init__()
+        self.image = pg.Surface((2 * size, 2 * size))
+        pg.draw.circle(self.image, (10, 10, 10), (size, size), size)
+        self.image.set_alpha(200)
+        self.image.set_colorkey((0, 0, 0))
+        self.rect = self.image.get_rect()
+        self.rect.center = bird.rect.center
+        self.life = life        
+
+    def update(self):
+        self.life -= 1
+        if self.life < 0:
+            self.kill()
 
 def main():
     pg.display.set_caption("真！こうかとん無双")
@@ -260,6 +275,7 @@ def main():
     beams = pg.sprite.Group()
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
+    gras = pg.sprite.Group()
 
     tmr = 0
     clock = pg.time.Clock()
@@ -270,6 +286,11 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+            if event.type == pg.KEYDOWN and event.key == pg.K_TAB:
+                if score.score >= 50: #あとで50に変える
+                    gras.add(Gravity(bird, 200, 500))
+                    score.score_up(-50)
+
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
@@ -289,6 +310,9 @@ def main():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
             score.score_up(1)  # 1点アップ
 
+        for gra in pg.sprite.groupcollide(bombs, gras, True, False).keys():
+            exps.add(Explosion(gra, 50))  # 爆発エフェクト
+
         if len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
             bird.change_img(8, screen) # こうかとん悲しみエフェクト
             score.update(screen)
@@ -305,6 +329,8 @@ def main():
         bombs.draw(screen)
         exps.update()
         exps.draw(screen)
+        gras.update()
+        gras.draw(screen)
         score.update(screen)
         pg.display.update()
         tmr += 1
