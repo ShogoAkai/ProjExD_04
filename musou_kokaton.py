@@ -74,8 +74,10 @@ class Bird(pg.sprite.Sprite):
 
 
 
+
         self.state = "normal"  #追加機能4
         self.hyper_life = -1
+
 
 
 
@@ -91,6 +93,7 @@ class Bird(pg.sprite.Sprite):
 
 
 
+
     def change_state(self, state: str, hyper_life: int):
         """
         こうかとんの状態を変更する
@@ -100,6 +103,7 @@ class Bird(pg.sprite.Sprite):
         """
         self.state = state
         self.hyper_life = hyper_life
+
 
 
 
@@ -125,6 +129,7 @@ class Bird(pg.sprite.Sprite):
         screen.blit(self.image, self.rect)
 
 
+
         if self.state == "hyper": #追加機能4
             self.hyper_life -= 1
             if self.hyper_life < 0:
@@ -132,6 +137,7 @@ class Bird(pg.sprite.Sprite):
             else:
                 # 画像を変換したものに切り替える
                 self.image = pg.transform.laplacian(self.image)
+
 
 
 
@@ -279,15 +285,18 @@ class Score:
         self.score += add
 
 
+
     
     def score_down(self, add):
         self.score -= add
 
 
 
+
     def update(self, screen: pg.Surface):
         self.image = self.font.render(f"Score: {self.score}", 0, self.color)
         screen.blit(self.image, self.rect)
+
 
 
 class Gravity(pg.sprite.Sprite):
@@ -332,6 +341,7 @@ class NeoGravity(pg.sprite.Sprite):
 
 
 
+
 def main():
     pg.display.set_caption("真！こうかとん無双")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -344,10 +354,12 @@ def main():
     exps = pg.sprite.Group()
     emys = pg.sprite.Group()
 
+
     gras = pg.sprite.Group()
 
 
     neos = pg.sprite.Group()
+
 
 
 
@@ -360,6 +372,12 @@ def main():
                 return 0
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 beams.add(Beam(bird))
+
+            if event.type == pg.KEYDOWN and event.key == pg.K_LSHIFT:
+                bird.speed = 20
+            if event.type == pg.KEYUP and event.key == pg.K_LSHIFT:
+                bird.speed = 10
+
 
             if event.type == pg.KEYDOWN and event.key == pg.K_TAB:
                 if score.score >= 50: #あとで50に変える
@@ -379,6 +397,7 @@ def main():
             score.score_down(10)
 
 
+
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
@@ -395,15 +414,23 @@ def main():
             score.score_up(10)  # 10点アップ
 
 
+            score.score_up(10)  # 10点アップ
+
+
             score.score_up(100)  # 10点アップ                             
 
             score.score_up(10)  # 10点アップ
+
 
 
             bird.change_img(6, screen)  # こうかとん喜びエフェクト
 
         for bomb in pg.sprite.groupcollide(bombs, beams, True, True).keys():
             exps.add(Explosion(bomb, 50))  # 爆発エフェクト
+
+            score.score_up(1)  # 1点アップ
+
+
 
             score.score_up(1)  # 1点アップ
 
@@ -430,6 +457,7 @@ def main():
                 score.score_up(1)  # 1点アップ
 
 
+
         if len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
             bird.change_img(8, screen) # こうかとん悲しみエフェクト
             score.update(screen)
@@ -453,6 +481,7 @@ def main():
 
         neos.update()
         neos.draw(screen)
+
 
 
         score.update(screen)
